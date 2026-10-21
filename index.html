@@ -53,8 +53,8 @@
       <li><a href="#c1">C1 <b>0.35</b></a></li>
       <li><a href="#open-loop">Open-loop <b>1.7</b></a></li>
       <li class="toc-sep"><a href="#results">Full results table</a></li>
-      <li><a href="#insights">New insights</a></li>
       <li><a href="#method">Method</a></li>
+      <li><a href="#insights">New insights</a></li>
     </ol>
   </nav>
 
@@ -180,24 +180,10 @@
   </section>
 
   <section>
-    <h2 class="paper-h" id="insights">New insights</h2>
-    <p class="paper-text">In this section we discuss where our current system falls short, what we think could push these results further, and what could make blind in-hand dexterity more common, especially for complex tasks like manipulating two objects at once.</p>
-    <h3 class="ds-h">What limits the hand today</h3>
-    <ul class="paper-list">
-      <li><b>FSR latency caps the speed.</b> The FSRs register a contact slightly after it actually happens, and even a firm press is not always picked up cleanly. That delay makes the hand less reactive, so the motion has to be slowed down on hardware to give the sensors time to catch up. Of our policies, the proprioception-only one runs the fastest gait, since it doesn't wait on touch at all. We believe lower-latency sensors would let a touch-driven policy run even faster gaits with better recovery.</li>
-      <li><b>Going faster trades endurance for speed.</b> When we sped up the hand's motion, rotations came noticeably quicker, but time to drop fell sharply and so did the total number of rotations: the fastest run we tested that still showed sustained motion reached only 10 full rotations. A faint contact still registers near the proximal and middle phalanges of the index and middle fingers, where a ball waits to be pushed by the thumb, and at the thumb tip. But when a ball brushes quickly across the sensors near the middle and ring fingers, it usually isn't registered at all. The policy would have to wait out the sensor latency for a contact that rarely arrives, and it loses the ball. This is why the hand has to move slowly.</li>
-      <li><b>Smooth balls slip past the sensors.</b> Our balls are very smooth, so friction works against us: a ball can slide over an FSR without pressing it hard enough to register a contact. With no contact signal, the policy has nothing to react to and no chance to recover before the ball falls. Again, the practical fix on hardware was to slow the hand down.</li>
-      <li><b>Slip between the fingers goes unseen.</b> A human hand has touch receptors everywhere; ours has 12 FSRs across the palm and phalanges. When a ball gets wedged between two phalanges, it often touches no sensor at all, and the policy has to act on its memory of where the ball might be. Proprioception doesn't fill the gap either: the balls are light and the joints, even at reduced stiffness, are too stiff for a ball's contact to show up in the joint readings.</li>
-    </ul>
-    <h3 class="ds-h">What we would build next</h3>
-    <ul class="paper-list">
-      <li><b>Put the sensing where contact happens.</b> Not every contact site matters equally. On Baoding balls, most contact lands on the proximal and middle phalanges and around the knuckles (figure below). This task would benefit most from denser sensing in exactly those regions.</li>
-      <li><b>Low-latency sensors.</b> We already know binary contact works: simple on/off touch was enough for the policy to infer roughly where the balls are. The open question is whether that contact can be sensed in real time, fast enough to catch a ball brushing past. There aren't many cheap alternatives to FSRs that do this today.</li>
-      <li><b>Discretised touch for harder tasks.</b> For more complex manipulation, we suggest discretised tactile readings, a few pressure ranges rather than a single on/off bit. We expect this to give the policy more information than binary contact while staying less noisy, over long horizons, than a continuous signal.</li>
-    </ul>
+    <h2 class="paper-h">Hardware</h2>
     <figure class="paper-fig">
-      <img src="img/fig_contact_heatmap.jpg" alt="Normalised tactile activation drawn over the hand, in simulation (left) and on hardware (right). On hardware, activation is highest on the proximal and middle phalanges of the middle and ring fingers." loading="lazy">
-      <figcaption><b>Where contact happens.</b> Normalised tactile activation across the hand in simulation (left) and on hardware (right). On hardware, contact concentrates on the proximal and middle phalanges of the middle and ring fingers and around the knuckles. These are the regions where better sensing would help this task most.</figcaption>
+      <img src="img/fig_fsr_layout.jpg" alt="Left: the physical Shadow Hand Lite with each FSR and BioTac site labelled. Right: the simulation model with matching sensor sites and joint names (FFJ1–4, MFJ1–4, RFJ1–4, THJ1–5)." loading="lazy">
+      <figcaption><b>FSR setup on the Shadow Dexterous Hand Lite.</b> Twelve force-sensitive resistors across the palm, knuckles and phalanges, plus four BioTac sensors at the fingertips, give 16 binary contact channels (left). Sensor sites were chosen from per-link contact frequencies in simulation, which were highest at the MCP regions, then the PIP regions and the palm. The simulation model mirrors this layout and labels each joint (right). The hand is tilted ~15° downward from horizontal during deployment.</figcaption>
     </figure>
   </section>
 
@@ -229,10 +215,24 @@
   </section>
 
   <section>
-    <h2 class="paper-h">Hardware</h2>
+    <h2 class="paper-h" id="insights">New insights</h2>
+    <p class="paper-text">In this section we discuss where our current system falls short, what we think could push these results further, and what could make blind in-hand dexterity more common, especially for complex tasks like manipulating two objects at once.</p>
+    <h3 class="ds-h">What limits the hand today</h3>
+    <ul class="paper-list">
+      <li><b>FSR latency caps the speed.</b> The FSRs register a contact slightly after it actually happens, and even a firm press is not always picked up cleanly. That delay makes the hand less reactive, so the motion has to be slowed down on hardware to give the sensors time to catch up. Of our policies, the proprioception-only one runs the fastest gait, since it doesn't wait on touch at all. We believe lower-latency sensors would let a touch-driven policy run even faster gaits with better recovery.</li>
+      <li><b>Going faster trades endurance for speed.</b> When we sped up the hand's motion, rotations came noticeably quicker, but time to drop fell sharply and so did the total number of rotations: the fastest run we tested that still showed sustained motion reached only 10 full rotations. A faint contact still registers near the proximal and middle phalanges of the index and middle fingers, where a ball waits to be pushed by the thumb, and at the thumb tip. But when a ball brushes quickly across the sensors near the middle and ring fingers, it usually isn't registered at all. The policy would have to wait out the sensor latency for a contact that rarely arrives, and it loses the ball. This is why the hand has to move slowly.</li>
+      <li><b>Smooth balls slip past the sensors.</b> Our balls are very smooth, so friction works against us: a ball can slide over an FSR without pressing it hard enough to register a contact. With no contact signal, the policy has nothing to react to and no chance to recover before the ball falls. Again, the practical fix on hardware was to slow the hand down.</li>
+      <li><b>Slip between the fingers goes unseen.</b> A human hand has touch receptors everywhere; ours has 12 FSRs across the palm and phalanges. When a ball gets wedged between two phalanges, it often touches no sensor at all, and the policy has to act on its memory of where the ball might be. Proprioception doesn't fill the gap either: the balls are light and the joints, even at reduced stiffness, are too stiff for a ball's contact to show up in the joint readings.</li>
+    </ul>
+    <h3 class="ds-h">What we would build next</h3>
+    <ul class="paper-list">
+      <li><b>Put the sensing where contact happens.</b> Not every contact site matters equally. On Baoding balls, most contact lands on the proximal and middle phalanges and around the knuckles (figure below). This task would benefit most from denser sensing in exactly those regions.</li>
+      <li><b>Low-latency sensors.</b> We already know binary contact works: simple on/off touch was enough for the policy to infer roughly where the balls are. The open question is whether that contact can be sensed in real time, fast enough to catch a ball brushing past. There aren't many cheap alternatives to FSRs that do this today.</li>
+      <li><b>Discretised touch for harder tasks.</b> For more complex manipulation, we suggest discretised tactile readings, a few pressure ranges rather than a single on/off bit. We expect this to give the policy more information than binary contact while staying less noisy, over long horizons, than a continuous signal.</li>
+    </ul>
     <figure class="paper-fig">
-      <img src="img/fig_fsr_layout.jpg" alt="Left: the physical Shadow Hand Lite with each FSR and BioTac site labelled. Right: the simulation model with matching sensor sites and joint names (FFJ1–4, MFJ1–4, RFJ1–4, THJ1–5)." loading="lazy">
-      <figcaption><b>FSR setup on the Shadow Dexterous Hand Lite.</b> Twelve force-sensitive resistors across the palm, knuckles and phalanges, plus four BioTac sensors at the fingertips, give 16 binary contact channels (left). Sensor sites were chosen from per-link contact frequencies in simulation, which were highest at the MCP regions, then the PIP regions and the palm. The simulation model mirrors this layout and labels each joint (right). The hand is tilted ~15° downward from horizontal during deployment.</figcaption>
+      <img src="img/fig_contact_heatmap.jpg" alt="Normalised tactile activation drawn over the hand, in simulation (left) and on hardware (right). On hardware, activation is highest on the proximal and middle phalanges of the middle and ring fingers." loading="lazy">
+      <figcaption><b>Where contact happens.</b> Normalised tactile activation across the hand in simulation (left) and on hardware (right). On hardware, contact concentrates on the proximal and middle phalanges of the middle and ring fingers and around the knuckles. These are the regions where better sensing would help this task most.</figcaption>
     </figure>
   </section>
 
