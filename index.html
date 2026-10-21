@@ -34,8 +34,7 @@
     <p class="paper-affil">University of Edinburgh<br><small>* Equal contribution</small></p>
     <!-- links: replace href="#" and drop the "todo" class once each link exists -->
     <div class="paper-links">
-      <a class="todo" href="#">arXiv</a>
-      <a class="todo" href="#">Workshop Paper (arXiv)</a>
+      <a href="https://arxiv.org/abs/2610.23438" target="_blank" rel="noopener">arXiv</a>
       <a href="https://github.com/elle-miller/roto/tree/s2r" target="_blank" rel="noopener">Code</a>
     </div>
   </header>
@@ -54,6 +53,7 @@
       <li><a href="#c1">C1 <b>0.35</b></a></li>
       <li><a href="#open-loop">Open-loop <b>1.7</b></a></li>
       <li class="toc-sep"><a href="#results">Full results table</a></li>
+      <li><a href="#insights">New insights</a></li>
       <li><a href="#method">Method</a></li>
     </ol>
   </nav>
@@ -180,6 +180,28 @@
   </section>
 
   <section>
+    <h2 class="paper-h" id="insights">New insights</h2>
+    <p class="paper-text">The benchmark shows that touch helps. Running the hand also showed us where binary FSR sensing falls short, and what better sensing for this task would look like.</p>
+    <h3 class="ds-h">What limits the hand today</h3>
+    <ul class="paper-list">
+      <li><b>FSR latency caps the speed.</b> The FSRs register a contact slightly after it actually happens, and even a firm press is not always picked up cleanly. That delay makes the hand less reactive, so the motion has to be slowed down on hardware to give the sensors time to catch up. C3 already runs the fastest gait of all our policies on hardware, and we believe lower-latency sensors would allow even faster gaits and better recovery.</li>
+      <li><b>Going faster trades endurance for speed.</b> When we sped up the hand's motion, rotations came noticeably quicker, but time to drop fell sharply and so did the total number of rotations: most of our faster runs ended within about 10 full rotations. The tactile logs show why. A faint contact still registers near the proximal and middle phalanges of the index and middle fingers, where a ball waits to be pushed by the thumb, and at the thumb tip. But when a ball brushes quickly across the sensors near the middle and ring fingers, it usually isn't registered at all. The policy would have to wait out the sensor latency for a contact that rarely arrives, and it loses the ball. This is why the hand has to move slowly.</li>
+      <li><b>Smooth balls slip past the sensors.</b> Our balls are very smooth, so friction works against us: a ball can slide over an FSR without pressing it hard enough to register a contact. With no contact signal, the policy has nothing to react to and no chance to recover before the ball falls. Again, the practical fix on hardware was to slow the hand down.</li>
+      <li><b>Slip between the fingers goes unseen.</b> A human hand has touch receptors nearly everywhere; ours has 12 FSRs across the palm and phalanges. When a ball gets wedged between two phalanges, it often touches no sensor at all, and the policy has to act on its memory of where the ball might be. Proprioception doesn't fill the gap either: the balls are light and the joints, even at reduced stiffness, are too stiff for a ball's contact to show up in the joint readings.</li>
+    </ul>
+    <h3 class="ds-h">What we would build next</h3>
+    <ul class="paper-list">
+      <li><b>Binary contact is a useful proxy for object state.</b> Simple on/off touch was enough for the policy to infer roughly where the balls are. For this task, we didn't need more than binary sensing.</li>
+      <li><b>Put the sensing where contact happens.</b> Not every contact site matters equally. On Baoding balls, most contact lands on the proximal and middle phalanges and around the knuckles (figure below). This task would benefit most from denser, low-latency sensors in exactly those regions.</li>
+      <li><b>Discretised touch for harder tasks.</b> For more complex manipulation, we suggest discretised tactile readings, a few pressure ranges rather than a single on/off bit. We expect this to give the policy more information than binary contact while staying less noisy, over long horizons, than a continuous signal.</li>
+    </ul>
+    <figure class="paper-fig">
+      <img src="img/fig_contact_heatmap.jpg" alt="Normalised tactile activation drawn over the hand, in simulation (left) and on hardware (right). On hardware, activation is highest on the proximal and middle phalanges of the middle and ring fingers." loading="lazy">
+      <figcaption><b>Where contact happens.</b> Normalised tactile activation across the hand in simulation (left) and on hardware (right). On hardware, contact concentrates on the proximal and middle phalanges of the middle and ring fingers and around the knuckles. These are the regions where better sensing would help this task most.</figcaption>
+    </figure>
+  </section>
+
+  <section>
     <h2 class="paper-h">Overview</h2>
     <p class="paper-text">Humans manipulate objects in-hand through touch alone with remarkable ease, but sustained real-world manipulation without vision remains an open challenge for robots. Reinforcement learning can produce sophisticated blind manipulation policies in simulation, yet transferring them to a real dexterous hand is hindered by continuously changing contacts, motion-induced drift in tactile signals, and the gap between simulated and physical dynamics.</p>
     <p class="paper-text">We study this problem through Baoding ball rotation on the four-fingered Shadow Dexterous Hand Lite. It is a harder test of in-hand dexterity than single-object reorientation: two free objects circulate simultaneously, interacting with each other and with the fingers, and their phase relationship must be maintained without being observed. The policy receives only proprioception and 16 binary contact signals. Zero-shot transfer is achieved through a sensor-aligned, coupling-aware simulation embodiment, per-channel tactile calibration, and two novel episodic domain randomisations: slew-rate action limits (SlewDR) and Stuck-AT Taxels (STAT).</p>
@@ -209,8 +231,8 @@
   <section>
     <h2 class="paper-h">Hardware</h2>
     <figure class="paper-fig">
-      <img src="img/fig2.jpg" alt="Force-sensitive resistor placement on the physical Shadow Hand Lite and the matching simulation model." loading="lazy">
-      <figcaption><b>FSR setup on the Shadow Dexterous Hand Lite.</b> Twelve force-sensitive resistors across the palm and phalanges, plus four BioTac sensors at the fingertips, give 16 binary contact channels (left). Sensor sites were chosen from per-link contact frequencies in simulation, which were highest at the MCP regions, then the PIP regions and the palm. The simulation model mirrors this layout (right). The hand is tilted ~15° downward from horizontal during deployment.</figcaption>
+      <img src="img/fig_fsr_layout.jpg" alt="Left: the physical Shadow Hand Lite with each FSR and BioTac site labelled. Right: the simulation model with matching sensor sites and joint names (FFJ1–4, MFJ1–4, RFJ1–4, THJ1–5)." loading="lazy">
+      <figcaption><b>FSR setup on the Shadow Dexterous Hand Lite.</b> Twelve force-sensitive resistors across the palm, knuckles and phalanges, plus four BioTac sensors at the fingertips, give 16 binary contact channels (left). Sensor sites were chosen from per-link contact frequencies in simulation, which were highest at the MCP regions, then the PIP regions and the palm. The simulation model mirrors this layout and labels each joint (right). The hand is tilted ~15° downward from horizontal during deployment.</figcaption>
     </figure>
   </section>
 
