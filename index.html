@@ -191,8 +191,8 @@
     </ul>
     <h3 class="ds-h">What we would build next</h3>
     <ul class="paper-list">
-      <li><b>Binary contact is a useful proxy for object state.</b> Simple on/off touch was enough for the policy to infer roughly where the balls are. For this task, we didn't need more than binary sensing.</li>
-      <li><b>Put the sensing where contact happens.</b> Not every contact site matters equally. On Baoding balls, most contact lands on the proximal and middle phalanges and around the knuckles (figure below). This task would benefit most from denser, low-latency sensors in exactly those regions.</li>
+      <li><b>Put the sensing where contact happens.</b> Not every contact site matters equally. On Baoding balls, most contact lands on the proximal and middle phalanges and around the knuckles (figure below). This task would benefit most from denser sensing in exactly those regions.</li>
+      <li><b>Low-latency sensors.</b> We already know binary contact works: simple on/off touch was enough for the policy to infer roughly where the balls are. The open question is whether that contact can be sensed in real time, fast enough to catch a ball brushing past. There aren't many cheap alternatives to FSRs that do this today.</li>
       <li><b>Discretised touch for harder tasks.</b> For more complex manipulation, we suggest discretised tactile readings, a few pressure ranges rather than a single on/off bit. We expect this to give the policy more information than binary contact while staying less noisy, over long horizons, than a continuous signal.</li>
     </ul>
     <figure class="paper-fig">
